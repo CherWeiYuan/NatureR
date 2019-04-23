@@ -25,6 +25,40 @@
 
 
 ##################
+#####Workflow#####
+##################
+install.packages("DiagrammeR")
+library(DiagrammeR)
+grViz("digraph flowchart {
+      # node definitions with substituted label text
+      node [fontname = Helvetica, shape = rectangle]        
+      tab1 [label = '@@1']
+      tab2 [label = '@@2']
+      tab3 [label = '@@3']
+      tab4 [label = '@@4']
+      tab5 [label = '@@5']
+      tab6 [label = '@@6']
+      tab7 [label = '@@7']
+      
+      # edge definitions with the node IDs
+      tab1 -> tab2 -> tab3
+      tab2 -> tab4
+      tab3 -> tab5
+      tab4 -> tab5
+      tab5 -> tab6 -> tab7;
+      }
+      
+      [1]: 'Questionnaire sent to n=58 respondents'
+      [2]: 'Chose GLM with negative binomial errors as var/mean > 3'
+      [3]: 'Proposed 140 meaningful models'
+      [4]: 'Dredge with different combinations of three explanatory variables'
+      [5]: 'Checking of assumptions and multicollinearity'
+      [6]: 'Model selection using AIC'
+      [7]: 'Interpretation and analysis'
+      ")
+
+
+##################
 ###Sorting data###
 ##################
 
@@ -48,7 +82,7 @@ data$obHeat <- as.factor(data$obHeat)
 data$obInterest <- as.factor(data$obInterest)
 
 str(data)
-
+pairs(data)
 
 #####################
 ###Choice of Model###
@@ -204,7 +238,6 @@ Model82<- glm.nb(visits~modeTransport+obLogistic+comFamily, data=data)
 
 #Variables used: modeTransport*obLogistic*comOrganization
 Model83<- glm.nb(visits~modeTransport+obLogistic+comOrganization, data=data)
-
 #Variables used: modeTransport*obLogistic*comFriends
 
 Model84<- glm.nb(visits~modeTransport+obLogistic+comFriends, data=data)
@@ -241,7 +274,7 @@ Model101<-glm.nb(visits~comAlone*obDanger, data=data)
 
 #Variables used: todAfternoon*comFamily*obDanger
 Model102<-glm.nb(visits~todAfternoon+comFamily+obDanger,data=data)
-Model103<-glm.nb(visits~todAfternoon+comFamily,data=data)
+Model103<-glm.nb(visits~todAfternoon*comFamily,data=data)
 Model104<-glm.nb(visits~todAfternoon*obDanger,data=data)
 Model105<-glm.nb(visits~comFamily*obDanger,data=data)
 
@@ -299,14 +332,14 @@ Model132<- glm.nb(visits ~ obDanger*obHeat*obInterest, data = data)
 
 #Variables used: gender*obDanger*comAlone
 #Reason: If you boi maybe you more brave lol 
-Model133<- glm.nb(visits ~gender + obDanger + comAlone, data = data)
+Model133<- glm.nb(visits ~gender * obDanger * comAlone, data = data)
 Model134<- glm.nb(visits ~gender*obDanger, data = data)
 Model135<- glm.nb(visits ~obDanger*comAlone, data = data)
 Model136<- glm.nb(visits ~gender*comAlone, data = data)
 
 #Variables used: education*ratEducation*ratLeisure
 #Reason: Do people with higher education visit NRs more for education and leisure?
-Model137<- glm.nb(visits ~gender+obDanger+comAlone, data = data)
+Model137<- glm.nb(visits ~gender*obDanger*comAlone, data = data)
 Model138<- glm.nb(visits ~gender*obDanger, data = data)
 Model139<- glm.nb(visits ~obDanger*comAlone, data = data)
 Model140<- glm.nb(visits ~gender*comAlone, data = data)
@@ -325,7 +358,7 @@ model_selection
 #Second best model is Model111, but delta = 3.63 and wight = 0.060; no need for model averaging
 
 Model127 <- glm.nb(visits ~ obInterest*comAlone, data = data)
-
+summary(Model127)
 
 #Checking assumptions for negative binomial models
 #1. Dependent variable is count data - OK
@@ -342,7 +375,8 @@ Model127 <- glm.nb(visits ~ obInterest*comAlone, data = data)
 ####################################
 ####Model Proposal using Dredge#####
 ####################################
-
+library(lme4)
+Model132<- glm.nb(visits ~ obDanger*obHeat*obInterest + data = data)
 
 library(car)
 
@@ -444,7 +478,7 @@ summary(model_average)
 data$comAlone <- factor(data$comAlone, labels = c("Do not visit alone", "Visit alone"))
 data$obInterest <- factor(data$obInterest, labels = c("No", "Yes"))
 Model127 <- glm.nb(visits ~ obInterest*comAlone, data = data)
-str(data)
+
 library(visreg)
 visreg(Model127, "obInterest", "comAlone", xlab = "Obstacles involving interest", ylab = "Number of visits", legend = TRUE, plot.type = "gg")
 
@@ -455,8 +489,6 @@ modelBest3 <- glm.nb(visits ~ comAlone+obHeat+todMorning, data = data)
 modelBest4 <- glm.nb(visits ~ comOrganization+obDanger+obHeat, data = data)
 model_average <- model.avg(automated_model_selection_nb,subset=delta <2)
 summary(model_average)
-
-
 
 
 
