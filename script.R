@@ -84,6 +84,10 @@ data$obInterest <- as.factor(data$obInterest)
 str(data)
 pairs(data)
 
+str(data$comFriends)
+head(data$comFriends)
+
+
 #####################
 ###Choice of Model###
 #####################
@@ -537,6 +541,18 @@ automated_model_selection_nb[1:10,] #views top ten models
 
 modelBest1 <- glm.nb(visits ~ obHeat + obInterest + todMorning, data = data)
 modelBest2 <- glm.nb(visits ~ obInterest + todMorning + comOrganization, data = data)
+
+summary(modelBest1)
+summary(modelBest2)
+
+#Since comOrganization1 was not significant, we try to remove it.
+modelBest2_update <- glm.nb(visits ~ obInterest + todMorning, data = data)
+anova(modelBest2, modelBest2_update)
+#p-value is 0.1099503; model did not worsen after removal of comOrganization
+AIC(modelBest2, modelBest2_update)
+#Yet model with comOrganization1 had lower AIC
+#Given the literature suggesting company as an important variable, we decide to keep it anyway despite
+#statistical insignificance due to its highly rated 'biological' significance
 
 #Checking for collinearity problems with the dredge models
 vif(modelBest1)
