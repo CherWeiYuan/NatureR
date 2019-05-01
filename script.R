@@ -88,6 +88,31 @@ str(data$comFriends)
 head(data$comFriends)
 
 
+###############################
+###Exploratory Data Analysis###
+###############################
+
+Tab<-data.frame(values=colSums(data1, na.rm=TRUE), names = names(data1))
+plot1<-ggplot(data=Tab, aes(x=names, y=values, fill=names)) +
+  geom_bar(stat="identity") + labs(x="Type of Company",y="Frequency indicated")+    
+  ggtitle("Frequency of the types of company during NR visits") +
+  theme(plot.title = element_text(size=38, face="bold", hjust = 0.5, vjust = 0.5),
+        legend.title = element_text(size=30, face="bold"), 
+        legend.text = element_text(size = 28),
+        axis.text.x = element_text(size = 28),
+        axis.text.y = element_text(size = 28),
+        axis.title.x = element_text(size=30),
+        axis.title.y = element_text(size=30),
+        panel.border = element_rect(colour = "black", fill=NA, size=1)) +
+  theme_classic()+
+  scale_fill_manual(breaks=c ("comAlone", "comFamily", "comFriends", "comOrganization"), values = c("#999999", "#E69F00","#D55E00", "#F0E442"))
+
+par(mfrow = c(2,2))
+plot(data$visits ~ data$comAlone)
+plot(data$visits ~ data$comFriends)
+plot(data$visits ~ data$comFamily)
+plot(data$visits ~ data$comOrganization)
+
 #####################
 ###Choice of Model###
 #####################
